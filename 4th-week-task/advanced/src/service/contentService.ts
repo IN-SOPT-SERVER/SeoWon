@@ -2,6 +2,12 @@ const contents = require('./../data/content.json');
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+//* 전체 content 조회
+const getAllContents = async () => {
+  const data = await prisma.Content.findMany();
+  return data;
+};
+
 //* content 조회
 const getContent = async (contentId: number, episode: number) => {
   const data = await prisma.Content.findMany({
@@ -9,9 +15,9 @@ const getContent = async (contentId: number, episode: number) => {
       id: contentId,
     },
     include: {
-      episode: {
+      Episode: {
         where: {
-          episodeNumber: episode,
+          episodeID: episode,
         },
       },
     },
@@ -21,11 +27,11 @@ const getContent = async (contentId: number, episode: number) => {
 
 //* liked content 생성
 
-const createLikedContent = async (userId: number, contentId: number) => {
+const createLikedContent = async (userID: number, contentID: number) => {
   const data = await prisma.LikedContent.create({
     data: {
-      userId,
-      contentId,
+      userID,
+      contentID,
     },
   });
   return data;
@@ -33,13 +39,13 @@ const createLikedContent = async (userId: number, contentId: number) => {
 
 //* liked content 조회
 
-const getLikedContents = async (userId: number) => {
+const getLikedContents = async (userID: number) => {
   const data = await prisma.LikedContent.findMany({
     where: {
-      userId,
+      userID,
     },
     select: {
-      content: true,
+      Content: true,
     },
   });
   return data;
@@ -55,6 +61,7 @@ const deleteLikedContent = async (likedContentId: number) => {
 
 
 export default{
+    getAllContents,
     getContent,
     createLikedContent,
     getLikedContents,

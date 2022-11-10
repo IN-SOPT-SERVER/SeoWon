@@ -1,17 +1,24 @@
 import { Request, Response } from "express";
 import { contentService } from "../service";
 
+//* content 전체 조회
+
+const getAllContents = async (req: Request, res: Response) => {
+    const data = await contentService.getAllContents();
+    return res.status(200).json({ status: 200, message: "Contents 전체 조회 성공", data });
+  };
+
 //* content 조회
 const getContent = async (req: Request, res: Response) => {
     const { contentID } = req.params;
-    const episodeID = req.query;
-    const data = await contentService.getContent(+contentID, +episodeID);
+    const { episodeID } = req.query;
+    const data = await contentService.getContent(+contentID, +(episodeID as string));
 
     if (!data){
         return res.status(404).json({status: 404, message: "Can't get content"});
     }
-
-    return res.status(200).json({status: 200, message: `${data.title} 조회 성공`, data});
+    console.log(data);
+    return res.status(200).json({status: 200, message: `${data[0].contentName} 조회 성공`, data});
     
 };
 
@@ -59,6 +66,7 @@ const deleteLikedContent = async (req: Request, res: Response) => {
 };
 
 export default{
+    getAllContents,
     getContent,
     createLikedContent,
     getLikedContent,
