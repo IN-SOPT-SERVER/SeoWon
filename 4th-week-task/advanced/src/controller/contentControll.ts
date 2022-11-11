@@ -5,6 +5,9 @@ import { contentService } from "../service";
 
 const getAllContents = async (req: Request, res: Response) => {
     const data = await contentService.getAllContents();
+    if (!data){
+        return res.status(204).json({status: 200, message: "No contents available"});
+    }
     return res.status(200).json({ status: 200, message: "Contents 전체 조회 성공", data });
   };
 
@@ -17,7 +20,7 @@ const getContent = async (req: Request, res: Response) => {
     if (!data){
         return res.status(404).json({status: 404, message: "Can't get content"});
     }
-    console.log(data);
+    
     return res.status(200).json({status: 200, message: `${data[0].contentName} 조회 성공`, data});
     
 };

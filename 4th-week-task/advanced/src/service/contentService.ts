@@ -1,4 +1,3 @@
-const contents = require('./../data/content.json');
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
@@ -7,21 +6,31 @@ const getAllContents = async () => {
   const data = await prisma.Content.findMany();
   return data;
 };
-
+ 
 //* content 조회
 const getContent = async (contentId: number, episode: number) => {
-  const data = await prisma.Content.findMany({
+
+  let data = await prisma.Content.findMany({
     where: {
       id: contentId,
     },
-    include: {
-      Episode: {
-        where: {
-          episodeID: episode,
+  })
+
+  if (episode){
+    data = await prisma.Content.findMany({
+      where: {
+        id: contentId,
+      },
+      include: {
+        Episode: {
+          where: {
+            episodeID: episode,
+          },
         },
       },
-    },
-  });
+  },
+  )}
+
   return data;
 };
 
