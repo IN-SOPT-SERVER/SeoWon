@@ -1,3 +1,4 @@
+import { UserUpdateDTO } from './../interfaces/UserDTO';
 import { Request, Response } from "express";
 import { userService } from "../service";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
@@ -8,9 +9,6 @@ import { fail, success } from "../constants/response";
 import jwtHandler from "../modules/jwtHandler";
 
 //* 유저 생성
-
-// src/controller/userController.ts
-
 const createUser = async (req: Request, res: Response) => {
 
   //? validation의 결과를 바탕으로 분기 처리
@@ -38,33 +36,32 @@ const createUser = async (req: Request, res: Response) => {
 };
 
 //* 유저 전체 조회
-
 const getAllUser = async (req: Request, res: Response) => {
   const data = await userService.getAllUser();
-  return res.status(200).json({ status: 200, message: "유저 전체 조회 성공", data });
+  return res.status(sc.OK).send(success(sc.OK, rm.READ_ALL_USERS_SUCCESS, data));
 };
 
 
 //* 유저 정보 업데이트
-
 const updateUser = async (req: Request, res: Response) => {
-  const { name } = req.body;
+  const userUpdateDTO : UserUpdateDTO = req.body;
   const { userId } = req.params;
-  if (!name) return res.status(400).json({ status: 400, message: "유저 정보 업데이트 실패" });
 
-  const updateUser = await userService.updateUser(+userId, name);
-  return res.status(200).json({ status: 200, message: "유저 전체 조회 성공", updateUser });
+  if (!userUpdateDTO) {
+    return res.status(sc.BAD_REQUEST).send(fail(sc.BAD_REQUEST, rm.UPDATE_USER_FAIL))
+  }
+
+  const updateUser = await userService.updateUser(+userId, userUpdateDTO);
+  return res.status(sc.OK).send(success(sc.OK, rm.UPDATE_USER_SUCCESS, updateUser));
 
 };
 
 
 //* 유저 삭제
-
 const deleteUser = async (req: Request, res: Response) => {
   const { userId } = req.params;
   await userService.deleteUser(+userId);
-  return res.status(200).json({ status: 200, message: "유저 삭제 성공"});
-
+  return res.status(sc.OK).send(success(sc.OK, rm.DELETE_USER_SUCCESS));
 };
 
 //* 유저 조회
@@ -74,9 +71,9 @@ const getUserById = async (req: Request, res: Response) => {
   const data = await userService.getUserById(+userId);
 
   if (!data) {
-    return res.status(404).json({ status: 404, message: "NOT_FOUND" });
+    return res.status(sc.NOT_FOUND).send(success(sc.NOT_FOUND, rm.NO_USER));
   }
-  return res.status(200).json({ status: 200, message: "유저 조회 성공", data });
+  return res.status(sc.OK).send(success(sc.OK, rm.READ_USER_SUCCESS, data));
 };
 
 //* 로그인

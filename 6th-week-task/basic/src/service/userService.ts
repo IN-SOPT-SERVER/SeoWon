@@ -1,3 +1,4 @@
+import { UserDTO, UserUpdateDTO } from './../interfaces/UserDTO';
 import { PrismaClient } from "@prisma/client";
 import { UserCreateDTO } from "../interfaces/UserCreateDTO";
 import { UserSignInDTO } from "../interfaces/UserSignInDTO";
@@ -24,45 +25,6 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
   return data;
 };
 
-//* 유저 전체 조회
-const getAllUser = async () => {
-  const data = await prisma.user.findMany();
-  return data;
-};
-
-//* 유저 정보 수정
-const updateUser = async (userId: number, name: string) => {
-  const data = await prisma.user.update({
-    where: {
-      id: userId
-    },
-    data: {
-      userName: name
-    }
-  })
-  return data;
-};
-
-//* 유저 삭제
-const deleteUser = async (userId: number) => {
-  await prisma.user.delete({
-    where: {
-      id: userId
-    }
-  })
-};
-
-//* userId로 유저 조회
-const getUserById = async (userId: number) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-
-  return user;
-};
-
 //* 로그인
 const signIn = async (userSignInDto: UserSignInDTO) => {
   try {
@@ -85,6 +47,44 @@ const signIn = async (userSignInDto: UserSignInDTO) => {
   }
 };
 
+//* 유저 전체 조회
+const getAllUser = async () : Promise<UserDTO[]>=> {
+  const data = await prisma.user.findMany();
+  return data;
+};
+
+//* 유저 정보 수정
+const updateUser = async (userId: number, userUpdateDTO: UserUpdateDTO) : Promise<UserDTO> => {
+  const data = await prisma.user.update({
+    where: {
+      id: userId
+    },
+    data: {
+      ...userUpdateDTO,
+    }
+  })
+  return data;
+};
+
+//* 유저 삭제
+const deleteUser = async (userId: number) => {
+  await prisma.user.delete({
+    where: {
+      id: userId
+    }
+  })
+};
+
+//* userId로 유저 조회
+const getUserById = async (userId: number) : Promise<UserDTO | null> => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  return user;
+};
 const userService = {
   createUser,
   getAllUser,
